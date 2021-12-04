@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy.orm import backref
 from forms import *
 from flask_migrate import Migrate
 from datetime import datetime
@@ -58,14 +59,9 @@ class Vendor(db.Model):
     purchase_to_points = db.Column(db.Integer)
     category = db.Column(db.String(120))
     cuisine = db.Column(db.String)
-    located = db.relationship('Location', backref='vendor', lazy=True)
+    location = db.Column(db.String(200))
     offers = db.relationship('Deals', backref = 'vendor', lazy=True)
-
-class Location(db.Model):
-    __tablename__ = 'Location'
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(200), nullable=False)
-    vendor_id = db.Column(db.Integer, db.ForeignKey('Vendor.id'), nullable=False)
+    menuItems = db.relationship('Menu', backref = backref('vendor', uselist = False), lazy=True)
 
 class Deals(db.Model):
     __tablename__ = 'Deals'
@@ -75,7 +71,12 @@ class Deals(db.Model):
     points_required = db.Column(db.Integer)
     vendor_id = db.Column(db.Integer, db.ForeignKey('Vendor.id'), nullable=False)
 
-
+class Menu(db.Model):
+    __tablename__ = 'Menu'
+    id = db.Column(db.Integer, primary_key = True)
+    item = db.Column(db.String(120), nullable = False)
+    price = db.Column(db.Integer)
+    vendor_id = db.Column(db.Integer, db.ForeignKey('Vendor.id'), nullable=False)
 
 
 #----------------------------------------------------------------------------#
@@ -96,12 +97,12 @@ def index():
 def vendors():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data = db.session.query(Vendor.name).all()
+  data = Vendor.query.order_by(db.desc(Vendor.id))
 
   return render_template('pages/vendors.html', vendors=data);
 
 @app.route('/vendors/search', methods=['POST'])
-def search_venues():
+def search_vendors():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
@@ -119,17 +120,19 @@ def search_venues():
   return render_template('pages/search_vendors.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/vendors/<int:vendor_id>')
-def show_venue(vendor_id):
+def show_vendor(vendor_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   vendor = Vendor.query.get(vendor_id)
-
+  
+  menuItems = vendor.menuItems
 
   data={
     "id": vendor.id,
     "name": vendor.name,
-    "category": vendor.category
-    #"average cost": vendor.cost
+    "category": vendor.category,
+    "location": vendor.location,
+    "menu": vendor.menuItems
   }
   return render_template('pages/show_vendor.html', vendor=data)
 
@@ -148,6 +151,7 @@ def create_vendor_submission():
   new_vendor = Vendor()
   new_vendor.name = request.form['name']
   new_vendor.category = request.form['category']
+  new_vendor.location = request.form['location']
 
   try:
     db.session.add(new_vendor)
@@ -250,6 +254,30 @@ def show_artist(artist_id):
 
   return render_template('pages/show_artist.html', artist=data)
 
+
+@app.route('/users/create', methods=['GET'])
+def create_user_form():
+  form = UserForm()
+  return render_template('forms/new_user.html', form=form)
+
+@app.route('/users/create', methods=['POST'])
+def create_user_submission():
+  new_user = User()
+ # new_artist.name = request.form['name']
+  new_user.username = request.form['username']
+  new_user.favorites = request.form['favorites']
+  try:
+    db.session.add(new_user)
+    db.session.commit()
+    # on successful db insert, flash success
+    flash('User ' + request.form['username'] + ' was successfully added!')
+  except:
+    db.session.rollback()
+    # TODO: on unsuccessful db insert, flash an error instead.
+    flash('An error occurred. Artist ' + new_user.username + ' could not be added.')
+  finally:
+    db.session.close()
+  return redirect(url_for('index'))
 #  delete artist
 #  ----------------------------------------------------------------
 @app.route('/artists/delete', methods=['POST'])

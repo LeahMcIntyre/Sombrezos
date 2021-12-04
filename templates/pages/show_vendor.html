@@ -11,8 +11,16 @@
 			</p>
 			<p class="category">
 				Category: {{ vendor.category}}
-					</p>
-			<h5><a href="/vendors/delete/{{ vendor.id }}"> Delete: {{ vendor.name }}</a></h5>
+			</p>
+			<p class="location">
+				Location: {{ vendor.location}}
+			</p>
+			<div class="menuItems">
+				{% for menu in vendor.menuItems}
+				<span class="menuItem"> {{ menu.item }}</span>
+				{% end for %}
+			</div>
 
 
 {% endblock %}
+

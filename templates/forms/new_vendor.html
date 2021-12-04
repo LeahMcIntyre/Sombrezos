@@ -14,10 +14,15 @@
             <div class="form-group">
               {{ form.category(class_ = 'form-control', placeholder='category', autofocus = true) }}
             </div>
-
           </div>
+        </div>
+  
+      <div class="form-group">
+        <label for="location">Location</label>
+        {{ form.location(class_ = 'form-control', autofocus = true) }}
       </div>
 
+        
       <input type="submit" value="Create Vendor" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>
