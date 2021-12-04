@@ -389,69 +389,34 @@ def edit_venue_submission(venue_id):
     db.session.close()
   return redirect(url_for('show_venue', venue_id=venue_id))
 
-#  Create Artist
+#  Create Deals
 #  ----------------------------------------------------------------
 
-@app.route('/artists/create', methods=['GET'])
-def create_artist_form():
-  form = ArtistForm()
-  return render_template('forms/new_artist.html', form=form)
+@app.route('/deals/create', methods=['GET'])
+def create_deal_form():
+  form = DealForm()
+  return render_template('forms/new_deal.html', form=form)
 
-@app.route('/artists/create', methods=['POST'])
-def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-  new_artist = Artist()
-  new_artist.name = request.form['name']
-  new_artist.city = request.form['city']
-  new_artist.state = request.form['state']
-  new_artist.genres = request.form['genres']
-  new_artist.phone = request.form['phone']
-  new_artist.facebook_link = request.form['facebook_link']
-  new_artist.image_link = request.form['image_link']
+@app.route('/deals/create', methods=['POST'])
+def create_deals_submission():
+  new_deal = Deals()
+  new_deal.items = (request.form['items'])
+  new_deal.price = int(request.form['price'])
+  new_deal.pointsRequired = int(request.form['pointsRequired'])
+  new_deal.vendorID = int(request.form['vendorID'])
   try:
-    db.session.add(new_artist)
+    db.session.add(new_deal)
     db.session.commit()
     # on successful db insert, flash success
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    flash('Deal ' + request.form['items'] + ' were successfully added!')
   except:
     db.session.rollback()
     # TODO: on unsuccessful db insert, flash an error instead.
-    flash('An error occurred. Artist ' + new_artist.name + ' could not be listed.')
+    flash('An error occurred. Deal ' + new_deal.items + ' could not be added.')
   finally:
     db.session.close()
   return redirect(url_for('index'))
 
-
-#  Shows
-#  ----------------------------------------------------------------
-
-@app.route('/shows')
-def shows():
-  # displays list of shows at /shows
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  shows_list = Show.query.all()
-  data = []
-  for show in shows_list:
-    if(show.upcoming):
-      data.append({
-      "venue_id": show.venue_id,
-      "venue_name": show.venue.name,
-      "artist_id": show.artist_id,
-      "artist_name": show.artist.name,
-      "artist_image_link": show.artist.image_link,
-      "start_time": str(show.start_time)
-      })
-
-  return render_template('pages/shows.html', shows=data)
-
-@app.route('/shows/create')
-def create_shows():
-  # renders form. do not touch.
-  form = ShowForm()
-  return render_template('forms/new_show.html', form=form)
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():

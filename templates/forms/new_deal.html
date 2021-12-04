@@ -1,0 +1,32 @@
+{% extends 'layouts/main.html' %}
+{% block title %}New Item{% endblock %}
+{% block content %}
+  <div class="form-wrapper">
+    <form method="post" class="form">
+      <h3 class="form-heading">Create a new Item</h3>
+
+      <div class="form-group">
+        <label for="items">Items</label>
+        {{ form.items(class_ = 'form-control', placeholder='burger', autofocus = true) }}
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price</label>
+        {{ form.price(class_ = 'form-control', placeholder='999', autofocus = true) }}
+      </div>
+
+      <div class="form-group">
+        <label for="pointsRequired">PointsRequired</label>
+        {{ form.pointsRequired(class_ = 'form-control', placeholder='666', autofocus = true) }}
+      </div>
+
+      <div class="form-group">
+        <label for="vendorID">VendorID</label>
+        {{ form.vendorID(class_ = 'form-control', placeholder='1234', autofocus = true) }}
+      </div>
+
+      <input type="submit" value="Create Item" class="btn btn-primary btn-lg btn-block">
+    </form>
+  </div>
+
+  {% endblock %}

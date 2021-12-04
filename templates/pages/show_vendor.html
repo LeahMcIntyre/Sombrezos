@@ -15,11 +15,7 @@
 			<p class="location">
 				Location: {{ vendor.location}}
 			</p>
-			<div class="menuItems">
-				{% for menu in vendor.menuItems}
-				<span class="menuItem"> {{ menu.item }}</span>
-				{% end for %}
-			</div>
+			<a href="/deals/create"><button class="btn btn-default btn-lg">Create a new deal</button></a>
 
 
 {% endblock %}
