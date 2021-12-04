@@ -1,0 +1,15 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Sombreza | Vendors{% endblock %}
+{% block content %}
+<ul class="items">
+	{% for vendor in vendors %}
+	<li>
+		<a href="/vendors/{{ vendor.id }}">
+			<div class="item">
+				<h5>{{ vendor.name }}</h5>
+			</div>
+		</a>
+	</li>
+	{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Sombreza | Users{% endblock %}
+{% block content %}
+<ul class="items">
+	{% for user in users %}
+	<li>
+		<a href="/users/{{ user.id }}">
+			<i class="fas fa-users"></i>
+			<div class="item">
+				<h5>{{ user.username }}</h5>
+			</div>
+		</a>
+	</li>
+	{% endfor %}
+
+	<a href="/users/create"><button class="btn btn-default btn-lg">Add a user</button></a>
+
+</ul>
+{% endblock %}

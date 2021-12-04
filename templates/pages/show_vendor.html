@@ -1,0 +1,18 @@
+{% extends 'layouts/main.html' %}
+{% block title %}{{ vendor.name }} | Vendor {% endblock %}
+{% block content %}
+<div class="row">
+	<div class="col-sm-6">
+		<h1 class="monospace">
+			{{ vendor.name }}
+			</h1>
+			<p class="subtitle">
+				ID: {{ vendor.id }}
+			</p>
+			<p class="category">
+				Category: {{ vendor.category}}
+					</p>
+			<h5><a href="/vendors/delete/{{ vendor.id }}"> Delete: {{ vendor.name }}</a></h5>
+
+
+{% endblock %}

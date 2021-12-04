@@ -1,0 +1,16 @@
+{% extends 'layouts/main.html' %}
+{% block title %}{{ user.username }} | User {% endblock %}
+{% block content %}
+<div class="row">
+	<div class="col-sm-6">
+		<h1 class="monospace">
+			{{ user.username }}
+			</h1>
+			<p class="subtitle">
+				ID: {{ vendor.id }}
+			</p>
+
+			<h5><a href="/users/delete/{{ user.id }}"> Delete: {{ user.username }}</a></h5>
+
+
+{% endblock %}
