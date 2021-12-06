@@ -24,6 +24,8 @@ class VendorForm(Form):
         'location', validators=[URL()]
     )
 
+    
+
 class UserForm(Form):
     username = StringField(
         'username', validators=[DataRequired()]
@@ -33,18 +35,25 @@ class UserForm(Form):
     )
 
 class DealForm(Form):
-    items = StringField(
-        'items', validators=[DataRequired()]
+    item = StringField(
+        'item', validators=[DataRequired()]
     )
-    price = IntegerField(
+    price = StringField(
         'price', validators=[DataRequired()]
     )
-    pointsRequired = IntegerField(
-        'pointsRequired', validators=[DataRequired()]
+    points_required = StringField(
+        'points_required', validators=[DataRequired()]
     )
-    vendorID = IntegerField(
-        'vendorID', validators=[DataRequired()]
+    vendor_id = StringField(
+        'vendor_id', validators=[DataRequired()]
     )
 
+class PurchaseForm(Form):
+    item = StringField(
+        'item', validators=[DataRequired()]
+    )
+    username = StringField(
+        'username', validators=[DataRequired()]
+    )
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM

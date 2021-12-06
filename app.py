@@ -35,12 +35,6 @@ favorites = db.Table('favorites',
     db.Column('vendor_id', db.Integer, db.ForeignKey('Vendor.id'), primary_key=True)
     )
 
-#Table that stores the userid, vendor id, and the reward points that user has for that vendor
-rewards = db.Table('rewards',
-    db.Column('user_id', db.Integer, db.ForeignKey('User.id'), primary_key=True),
-    db.Column('vendor_id', db.Integer, db.ForeignKey('Vendor.id'), primary_key=True),
-    db.Column('points', db.Integer)
-    )
 
 #Table for user
 class User(db.Model):
@@ -48,7 +42,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique = True)
     favorites = db.relationship('Vendor', secondary=favorites, lazy='subquery', backref=db.backref('favUsers', lazy=True))
-    rewards = db.relationship('Vendor', secondary=rewards, lazy='subquery', backref=db.backref('users', lazy=True))
+    rewards = db.relationship('rewards', back_populates='vendor')
 
 class Vendor(db.Model):
     __tablename__ = 'Vendor'
@@ -62,11 +56,12 @@ class Vendor(db.Model):
     location = db.Column(db.String(200))
     offers = db.relationship('Deals', backref = 'vendor', lazy=True)
     menuItems = db.relationship('Menu', backref = backref('vendor', uselist = False), lazy=True)
+    rewards = db.relationship('rewards', back_populates='user')
 
 class Deals(db.Model):
     __tablename__ = 'Deals'
     id = db.Column(db.Integer, primary_key = True)
-    items = db.Column(db.String)
+    item = db.Column(db.String)
     price = db.Column(db.Integer)
     points_required = db.Column(db.Integer)
     vendor_id = db.Column(db.Integer, db.ForeignKey('Vendor.id'), nullable=False)
@@ -78,6 +73,14 @@ class Menu(db.Model):
     price = db.Column(db.Integer)
     vendor_id = db.Column(db.Integer, db.ForeignKey('Vendor.id'), nullable=False)
 
+class rewards(db.Model):
+  __tablename__ = 'rewards'
+  user_id = db.Column(db.Integer, db.ForeignKey('User.id'), primary_key=True)
+  vendor_id = db.Column(db.Integer, db.ForeignKey('Vendor.id'), primary_key=True)
+  points = db.Column(db.Integer)
+
+  user = db.relation('User', back_populates='vendors')
+  vendor = db.relationship('Vendor', back_populates='users')
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -126,13 +129,22 @@ def show_vendor(vendor_id):
   vendor = Vendor.query.get(vendor_id)
   
   menuItems = vendor.menuItems
+  fullMenu = []
+
+  for menu in menuItems: 
+    menu_info= {
+      "menu_id": menu.id,
+      "menu_item": menu.item,
+      "menu_price": menu.price
+    }
+    fullMenu.append(menu_info)
 
   data={
     "id": vendor.id,
     "name": vendor.name,
     "category": vendor.category,
     "location": vendor.location,
-    "menu": vendor.menuItems
+    "fullMenu": fullMenu
   }
   return render_template('pages/show_vendor.html', vendor=data)
 
@@ -169,12 +181,12 @@ def create_vendor_submission():
 
 #  delete Vendor need to  figure out
 #  ----------------------------------------------------------------
-@app.route('/vendors/delete/<int:vendor_id>', methods=['POST'])
-def delete_venue():
+@app.route('/vendors/delete/<int:vendor_id>', methods=['GET', 'POST'])
+def delete_vendor(vendor_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-  vendor_id = request.form.get('vendor_id')
-  deleted_vendor = Vendor.query.get(id)
+  
+  deleted_vendor = Vendor.query.get(vendor_id)
   vendorName = deleted_vendor.name
   try:
     db.session.delete(deleted_vendor)
@@ -215,44 +227,7 @@ def search_users():
       })
   return render_template('pages/search_users.html', results=response, search_term=request.form.get('search_term', ''))
 
-@app.route('/artists/<int:artist_id>')
-def show_artist(artist_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
-  artist = Artist.query.get(artist_id)
-  shows = artist.shows
-  past_shows = []
-  upcoming_shows = []
-  for show in shows:
-    show_info = {
-      "venue_id": show.venue_id,
-      "venue_name": show.venue.name,
-      "venue_image_link": show.venue.image_link,
-      "start_time": str(show.start_time)
-    }
-    if(show.upcoming):
-      upcoming_shows.append(show_info)
-    else:
-      past_shows.append(show_info)
-  data = {
-    "id": artist.id,
-    "name": artist.name,
-    "genres": artist.genres.split(','),
-    "city": artist.city,
-    "state": artist.state,
-    "phone": artist.phone,
-    "website": artist.website,
-    "facebook_link": artist.facebook_link,
-    "seeking_venue": artist.seeking_venue,
-    "seeking_description":artist.seeking_description,
-    "image_link": artist.image_link,
-    "past_shows": past_shows,
-    "upcoming_shows": upcoming_shows,
-    "past_shows_count": len(past_shows),
-    "upcoming_shows_count": len(upcoming_shows)
-  }
 
-  return render_template('pages/show_artist.html', artist=data)
 
 
 @app.route('/users/create', methods=['GET'])
@@ -260,7 +235,7 @@ def create_user_form():
   form = UserForm()
   return render_template('forms/new_user.html', form=form)
 
-@app.route('/users/create', methods=['POST'])
+@app.route('/users/create', methods=['GET', 'POST'])
 def create_user_submission():
   new_user = User()
  # new_artist.name = request.form['name']
@@ -278,47 +253,40 @@ def create_user_submission():
   finally:
     db.session.close()
   return redirect(url_for('index'))
-#  delete artist
-#  ----------------------------------------------------------------
-@app.route('/artists/delete', methods=['POST'])
-def delete_artist():
-  artist_id = request.form.get('artist_id')
-  deleted_artist = Artist.query.get(artist_id)
-  artistName = deleted_artist.name
-  try:
-    db.session.delete(deleted_artist)
-    db.session.commit()
-    flash('Artist ' + artistName + ' was successfully deleted!')
-  except:
-    db.session.rollback()
-    flash('please try again. Venue ' + artistName + ' could not be deleted.')
-  finally:
-    db.session.close()
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return redirect(url_for('index'))
-#  Update
-#  ----------------------------------------------------------------
-@app.route('/artists/edit', methods=['GET'])
-def edit_artist():
-  form = ArtistForm()
-  artist_id = request.args.get('artist_id')
-  artist = Artist.query.get(artist_id)
-  artist_info={
-    "id": artist.id,
-    "name": artist.name,
-    "genres": artist.genres.split(','),
-    "city": artist.city,
-    "state": artist.state,
-    "phone": artist.phone,
-    "website": artist.website,
-    "facebook_link": artist.facebook_link,
-    "seeking_venue": artist.seeking_venue,
-    "seeking_description": artist.seeking_description,
-    "image_link": artist.image_link
+
+@app.route('/vendors/edit', methods=['GET'])
+def edit_vendor():
+  form = VendorForm()
+  vendor_id = request.args.get('vendor_id')
+  vendor = Vendor.query.get(vendor_id)
+  
+  vendor_info={
+    "id": vendor.id,
+    "name": vendor.name,
+    "category": vendor.category,
+    "location": vendor.location,
   }
   # TODO: populate form with fields from artist with ID <artist_id>
-  return render_template('forms/edit_artist.html', form=form, artist=artist_info)
+  return render_template('forms/edit_vendor.html', form=form, vendor=vendor_info)
+
+@app.route('/vendors/<int:vendor_id>/edit', methods=['GET', 'POST'])
+def edit_vendor_submission(vendor_id):
+  # TODO: take values from the form submitted, and update existing
+  # venue record with ID <venue_id> using the new attributes
+  vendor = Vendor.query.get(vendor_id)
+  vendor.name = request.form['name']
+  vendor.category = request.form['category']
+  vendor.location = request.form['location']
+
+  try:
+    db.session.commit()
+    flash('Vendor ' + request.form['name'] + ' was successfully updated!')
+  except:
+    db.session.rollback()
+    flash('An error occurred. Venue ' + vendor.name + ' could not be updated.')
+  finally:
+    db.session.close()
+  return redirect(url_for('vendor', vendor_id=vendor_id))
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
@@ -343,119 +311,86 @@ def edit_artist_submission(artist_id):
     db.session.close()
   return redirect(url_for('show_artist', artist_id=artist_id))
 
-@app.route('/venues/edit', methods=['GET'])
-def edit_venue():
-  venue_id = request.args.get('venue_id')
-  form = VendorForm()
-  venue = Venue.query.get(venue_id)
-  venue_info={
-    "id": venue.id,
-    "name": venue.name,
-    "genres": venue.genres.split(','),
-    "address": venue.address,
-    "city": venue.city,
-    "state": venue.state,
-    "phone": venue.phone,
-    "website": venue.website,
-    "facebook_link": venue.facebook_link,
-    "seeking_talent": venue.seeking_talent,
-    "seeking_description": venue.seeking_description,
-    "image_link": venue.image_link
+@app.route('/vendors/<int:vendor_id>/purchase', methods = ['GET', 'POST'])
+def create_purchase_form(vendor_id):
+  form = PurchaseForm()
+  vendor = Vendor.query.get(vendor_id)
+  users = User.query.with_entities(User.id, User.username).all()
+
+  menuItems = vendor.menuItems
+  fullMenu = []
+
+  for menu in menuItems: 
+    menu_info= {
+      "menu_id": menu.id,
+      "menu_item": menu.item,
+      "menu_price": menu.price
+    }
+    fullMenu.append(menu_info)
+
+  user_info =[]
+  for user in users:
+    info = {
+      "id": user.id,
+      "username": user.username
+    }
+    user_info.append(info)
+  
+  data = {
+    "users": user_info,
+    "vendor_id": vendor.id,
+    "menu" : fullMenu
   }
-  # TODO: populate form with values from venue with ID <venue_id>
-  return render_template('forms/edit_venue.html', form=form, venue=venue_info)
+  return render_template('forms/purchase.html', form=form, data=data)
 
-@app.route('/venues/<int:venue_id>/edit', methods=['POST'])
-def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
-  venue = Venue.query.get(venue_id)
-  venue.name = request.form['name']
-  venue.city = request.form['city']
-  venue.state = request.form['state']
-  venue.address = request.form['address']
-  venue.phone = request.form['phone']
-  venue.facebook_link = request.form['facebook_link']
-  venue.genres = request.form['genres']
-  venue.image_link = request.form['image_link']
-  venue.website = request.form['website']
-  try:
-    db.session.commit()
-    flash('Venue ' + request.form['name'] + ' was successfully updated!')
-  except:
-    db.session.rollback()
-    flash('An error occurred. Venue ' + new_venue.name + ' could not be updated.')
-  finally:
-    db.session.close()
-  return redirect(url_for('show_venue', venue_id=venue_id))
+@app.route('/vendors/<int:vendor_id>/purchase', methods=['GET', 'POST'])
+def create_purchase_submission(vendor_id):
+  user_id = request.form['user']
+  vendor = Vendor.query.get(vendor_id)
+  conversion = vendor.purchase_to_points
+  user = User.query.get(user_id)
 
-#  Create Deals
-#  ----------------------------------------------------------------
+  purchase_items = request.form['itmes']
+  price = 0
 
-@app.route('/deals/create', methods=['GET'])
-def create_deal_form():
-  form = DealForm()
-  return render_template('forms/new_deal.html', form=form)
+  for purchase_id in purchase_items:
+    item = Menu.query.get(purchase_id)
+    price = price + item.price
 
-@app.route('/deals/create', methods=['POST'])
-def create_deals_submission():
-  new_deal = Deals()
-  new_deal.items = (request.form['items'])
-  new_deal.price = int(request.form['price'])
-  new_deal.pointsRequired = int(request.form['pointsRequired'])
-  new_deal.vendorID = int(request.form['vendorID'])
-  try:
-    db.session.add(new_deal)
-    db.session.commit()
-    # on successful db insert, flash success
-    flash('Deal ' + request.form['items'] + ' were successfully added!')
-  except:
-    db.session.rollback()
-    # TODO: on unsuccessful db insert, flash an error instead.
-    flash('An error occurred. Deal ' + new_deal.items + ' could not be added.')
-  finally:
-    db.session.close()
+  new_points = price * conversion
+  result = rewards.query.filter_by(rewards.vendor_id == vendor_id,  rewards.user_id == user_id).first()
+  
+  if result:
+    result.points = result.points + new_points
+    try:
+      db.session.commit()
+      # on successful db insert, flash success
+      flash('Purchase Made')
+    except:
+      db.session.rollback()
+      # TODO: on unsuccessful db insert, flash an error instead.
+      flash('Purchase could not be made!')
+    finally:
+      db.session.close()
+  else:
+    new_rewards = rewards()
+    new_rewards.vendor_id = vendor_id
+    new_rewards.user_id = user_id
+    new_rewards.points = new_points
+    try:
+      db.session.commit()
+      # on successful db insert, flash success
+      flash('Purchase Made')
+    except:
+      db.session.rollback()
+      # TODO: on unsuccessful db insert, flash an error instead.
+      flash('Purchase could not be made!')
+    finally:
+      db.session.close()
   return redirect(url_for('index'))
 
 
-@app.route('/shows/create', methods=['POST'])
-def create_show_submission():
-  # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
-  new_show = Show()
-  new_show.artist_id = request.form['artist_id']
-  new_show.venue_id = request.form['venue_id']
-  dateAndTime = request.form['start_time'].split(' ')
-  DTList = dateAndTime[0].split('-')
-  DTList += dateAndTime[1].split(':')
-  for i in range(len(DTList)):
-    DTList[i] = int(DTList[i])
-  new_show.start_time = datetime(DTList[0],DTList[1],DTList[2]
-                                        ,DTList[3],DTList[4],DTList[5])
-  now = datetime.now()
-  new_show.upcoming = (now < new_show.start_time)
-  try:
-    db.session.add(new_show)
-    # update venue and artist table
-    updated_artist = Artist.query.get(new_show.artist_id)
-    updated_venue = Venue.query.get(new_show.venue_id)
-    if(new_show.upcoming):
-      updated_artist.upcoming_shows_count += 1;
-      updated_venue.upcoming_shows_count += 1;
-    else:
-      updated_artist.past_shows_count += 1;
-      updated_venue.past_shows_count += 1;
-    # on successful db insert, flash success
-    db.session.commit()
-    flash('Show was successfully listed!')
-  except:
-    db.session.rollback()
-    # TODO: on unsuccessful db insert, flash an error instead.
-    flash('Show could not be listed. please make sure that your ids are correct')
-  finally:
-    db.session.close()
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return redirect(url_for('index'))
+
 
 @app.errorhandler(404)
 def not_found_error(error):

@@ -1,0 +1,21 @@
+<form action = "/vendors/{{data.vendor_id}}/purchase" method = "post" >
+    <div>
+        <label for="user">Choose a user:</label>
+        <select id="user" name="user">
+        {%for user in data.users%}
+            <option value={{user.id}}>{{user.username}}</option>
+        {% endfor %}
+        </select>
+    </div>
+   
+    <div> Choose the item you purchased:
+        {%for menu in data.menu%}
+        
+        <input type="checkbox" id={{menu.menu_id}} name="items" value={{menu.menu_id}}>
+            <label for={{menu.menu_id}}>{{menu.menu_item}}: ${{menu.menu_price}}</label>
+        {% endfor %}
+
+    </div>
+
+   <input type="submit">
+</form>
