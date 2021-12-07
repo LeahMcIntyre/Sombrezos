@@ -6,16 +6,25 @@
 		<h1 class="monospace">
 			{{ vendor.name }}
 		</h1>
-			<p class="subtitle">
+			<p class="id">
 				ID: {{ vendor.id }}
 			</p>
 			<p class="category">
 				Category: {{ vendor.category}}
 			</p>
+			<p class="cuisine">
+				Cuisine: {{ vendor.cuisine}}
+			</p>
+			<p class="cost">
+				Cost: {{ vendor.cost}}
+			</p>
+			<p class="Points per dollar spent">
+				Points Per Dollar Spent: {{ vendor.purchase_to_points}}
+			</p>
 			<p class="location">
 				Location: {{ vendor.location}}
 			</p>
-			<a href="/deals/create"><button class="btn btn-default btn-lg">Create a new deal</button></a>
+
 	</div>
 </div>
 <section>
@@ -33,8 +42,14 @@
 	<a href="/vendors/{{ vendor.id }}/purchase"><button class="btn btn-default btn-lg">Make a purchase</button></a>
 </section>
 
-<a href="/vendors/{{ vendor.id }}/edit"><button class="btn btn-default btn-lg">Edit Vendor</button></a>
+<a href="/vendors/{{ vendor.id }}/edit"><button class="btn btn-default btn-lg">Edit Vendor Info</button></a>
 <a href="/vendors/delete/{{ vendor.id }}"><button class="btn btn-default btn-lg">Delete Vendor</button></a>
+<a href="/vendors/{{ vendor.id }}/add_menu_item"><button class="btn btn-default btn-lg">Add Menu Item</button></a>
+<a href="/vendors/{{ vendor.id }}/delete_menu_item"><button class="btn btn-default btn-lg">Delete Menu Item</button></a>
+
+<a href="/deals/create"><button class="btn btn-default btn-lg">Create a new deal</button></a>
+
+
 
 
 

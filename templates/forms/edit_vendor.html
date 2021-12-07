@@ -2,27 +2,41 @@
 {% block title %}Edit Vendor{% endblock %}
 {% block content %}
   <div class="form-wrapper">
-    <form class="form" method="post" action="/vendors/{{vendor.id}}/edit">
+    <form class="form" method="post" action="/vendors/{{vendor.id}}/edit_info">
       <h3 class="form-heading">Edit vendor <em>{{ vendor.name }}</em> <a href="{{ url_for('index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
       <div class="form-group">
-
         <label for="name">Name</label>
-        <h6 class="form-group">{{ vendor.name }}</h6>
         {{ form.name(class_ = 'form-control', autofocus = true) }}
-      </div>
-      
-      <div class="form-group">
-        <label for="location">Location</label>
-        <h6 class="form-group">{{ vendor.location }}</h6>
-
-        {{ form.location(class_ = 'form-control', autofocus = true) }}
       </div>
 
       <div class="form-group">
         <label for="category">Category</label>
         <h6 class="form-group">{{ vendor.category }}</h6>
         {{ form.category(class_ = 'form-control', autofocus = true) }}
-      </div>  
+      </div>
+
+      <div class="form-group">
+        <label for="cost">Cost</label>
+        <h6 class="form-group">{{ vendor.cost }}</h6>
+        {{ form.cost(class_ = 'form-control', autofocus = true) }}
+      </div>
+
+      <div class="form-group">
+        <label for="cuisine">Cuisine</label>
+        <h6 class="form-group">{{ vendor.cuisine }} </h6>
+        {{ form.cuisine(class_ = 'form-control', autofocus = true) }}
+      </div>
+      
+      <div class="form-group">
+        <label for="location">Location</label>
+        {{ form.location(class_ = 'form-control', autofocus = true) }}
+      </div>
+
+      <div class="form-group">
+        <label for="purchase_to_points">Points Per Dollar Spent</label>
+        <h6 class="form-group">{{ vendor.purchase_to_points }}</h6>
+        {{ form.purchase_to_points(class_ = 'form-control', autofocus = true) }}
+      </div>
 
       
       <input type="submit" value="Edit vendor" class="btn btn-primary btn-lg btn-block">
