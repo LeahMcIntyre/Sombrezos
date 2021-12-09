@@ -7,19 +7,19 @@
 		<p class="lead">A virtual food</p>
 		<h3>
 			<a href="/vendors"><button class="btn btn-primary btn-lg">Find a vendor</button></a>
-			<a href="/vendors/create"><button class="btn btn-default btn-lg">Create a vendor</button></a>
+			<a href="/vendors/create"><button class="btn btn-primary btn-lg">Create a vendor</button><br></a>
+			<a href="/users"><button class="btn btn-primary btn-lg">Find a user</button></a>
+			<a href="/users/create"><button class="btn btn-primary btn-lg">Create a user</button></a>
 
 
 		</h3>
-
-		<p class="lead">Publicize about your show for free.</p>
-
 	</div>
 	<div class="col-sm-6 hidden-sm hidden-xs">
-		<img id="front-splash" src="{{ url_for('static',filename='img/front-splash.jpg') }}" alt="Front Photo of Musical Band" />
+		<img id="front-splash" src="{{ url_for('static',filename='img/front-splash.jpg') }}" alt="Front Photo of Food Court" />
 	</div>
 </div>
 
+<!-- 
 <section class="row">
 	<h3>Recent Listed Vendors</h3>
 	<div class="row">
@@ -34,19 +34,5 @@
 	    {% endfor %}
 	</div>
 </section>
-
-<section class="row">
-	<h3>Recent Listed Vendors</h3>
-	<div class="row">
-	    {%for vendor in Vendor %}
-	    <div class="col-sm-4">
-	        <div class="tile tile-show">
-	        	<h4>{{ vendor.name }}</h4>
-	        	<h4>ID: {{ vendor.id }}</h4>
-	            <h5><a href="/vendors/{{ vendor.id }}">{{ vendor.name }}</a></h5>
-	        </div>
-	    </div>
-	    {% endfor %}
-	</div>
-</section>
+-->
 {% endblock %}

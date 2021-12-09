@@ -65,25 +65,25 @@ fieldset[disabled] .btn-danger {
   background-image: none;
 }
 .btn-default {
-  background-image: -webkit-linear-gradient(top, #ffffff 0%, #e0e0e0 100%);
-  background-image: -o-linear-gradient(top, #ffffff 0%, #e0e0e0 100%);
+  background-image: -webkit-linear-gradient(top, #129dee 0%, #e0e0e0 100%);
+  background-image: -o-linear-gradient(top, #129dee 0%, #e0e0e0 100%);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e0e0e0));
-  background-image: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+  background-image: linear-gradient(to bottom, #129dee 0%, #e0e0e0 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe0e0e0', GradientType=0);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   background-repeat: repeat-x;
-  border-color: #dbdbdb;
+  border-color: #129dee;
   text-shadow: 0 1px 0 #fff;
   border-color: #ccc;
 }
 .btn-default:hover,
 .btn-default:focus {
-  background-color: #e0e0e0;
+  background-color: #129dee;
   background-position: 0 -15px;
 }
 .btn-default:active,
 .btn-default.active {
-  background-color: #e0e0e0;
+  background-color: #129dee;
   border-color: #dbdbdb;
 }
 .btn-default.disabled,
@@ -108,24 +108,24 @@ fieldset[disabled] .btn-default.active {
   background-image: none;
 }
 .btn-primary {
-  background-image: -webkit-linear-gradient(top, #ffc63a 0%, #fcb300 100%);
-  background-image: -o-linear-gradient(top, #ffc63a 0%, #fcb300 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffc63a), to(#fcb300));
-  background-image: linear-gradient(to bottom, #ffc63a 0%, #fcb300 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffc63a', endColorstr='#fffcb300', GradientType=0);
+  background-image: -webkit-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -o-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#35dbf1), to(#35dbf1));
+  background-image: linear-gradient(to bottom, #35dbf1 0%, #35dbf1 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#35dbf1', endColorstr='#35dbf1', GradientType=0);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   background-repeat: repeat-x;
-  border-color: #f2ac00;
+  border-color: #35dbf1;
 }
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: #fcb300;
+  background-color: #35dbf1;
   background-position: 0 -15px;
 }
 .btn-primary:active,
 .btn-primary.active {
-  background-color: #fcb300;
-  border-color: #f2ac00;
+  background-color: #35dbf1;
+  border-color: #35dbf1;
 }
 .btn-primary.disabled,
 .btn-primary[disabled],
@@ -145,7 +145,7 @@ fieldset[disabled] .btn-primary:active,
 .btn-primary.disabled.active,
 .btn-primary[disabled].active,
 fieldset[disabled] .btn-primary.active {
-  background-color: #fcb300;
+  background-color: #35dbf1;
   background-image: none;
 }
 .btn-success {
@@ -330,13 +330,13 @@ fieldset[disabled] .btn-danger.active {
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
-  background-image: -webkit-linear-gradient(top, #ffc63a 0%, #ffbf21 100%);
-  background-image: -o-linear-gradient(top, #ffc63a 0%, #ffbf21 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffc63a), to(#ffbf21));
-  background-image: linear-gradient(to bottom, #ffc63a 0%, #ffbf21 100%);
+  background-image: -webkit-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -o-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#35dbf1), to(#35dbf1));
+  background-image: linear-gradient(to bottom, #35dbf1 0%, #35dbf1 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffc63a', endColorstr='#ffffbf21', GradientType=0);
   background-repeat: repeat-x;
-  background-color: #ffbf21;
+  background-color: #35dbf1;
 }
 .navbar-default {
   background-image: -webkit-linear-gradient(top, #ffffff 0%, #f8f8f8 100%);
@@ -400,10 +400,10 @@ fieldset[disabled] .btn-danger.active {
   .navbar .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar .navbar-nav .open .dropdown-menu > .active > a:focus {
     color: #fff;
-    background-image: -webkit-linear-gradient(top, #ffc63a 0%, #ffbf21 100%);
-    background-image: -o-linear-gradient(top, #ffc63a 0%, #ffbf21 100%);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#ffc63a), to(#ffbf21));
-    background-image: linear-gradient(to bottom, #ffc63a 0%, #ffbf21 100%);
+    background-image: -webkit-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+    background-image: -o-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#35dbf1), to(#35dbf1));
+    background-image: linear-gradient(to bottom, #35dbf1 0%, #35dbf1 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffc63a', endColorstr='#ffffbf21', GradientType=0);
     background-repeat: repeat-x;
   }
@@ -510,14 +510,14 @@ fieldset[disabled] .btn-danger.active {
 .list-group-item.active,
 .list-group-item.active:hover,
 .list-group-item.active:focus {
-  text-shadow: 0 -1px 0 #ffb707;
-  background-image: -webkit-linear-gradient(top, #ffc63a 0%, #ffbb14 100%);
-  background-image: -o-linear-gradient(top, #ffc63a 0%, #ffbb14 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffc63a), to(#ffbb14));
-  background-image: linear-gradient(to bottom, #ffc63a 0%, #ffbb14 100%);
+  text-shadow: 0 -1px 0 #35dbf1;
+  background-image: -webkit-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -o-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#35dbf1), to(#35dbf1));
+  background-image: linear-gradient(to bottom, #35dbf1 0%, #35dbf1 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffc63a', endColorstr='#ffffbb14', GradientType=0);
   background-repeat: repeat-x;
-  border-color: #ffbb14;
+  border-color: #35dbf1;
 }
 .list-group-item.active .badge,
 .list-group-item.active:hover .badge,
@@ -537,10 +537,10 @@ fieldset[disabled] .btn-danger.active {
   background-repeat: repeat-x;
 }
 .panel-primary > .panel-heading {
-  background-image: -webkit-linear-gradient(top, #ffc63a 0%, #ffbf21 100%);
-  background-image: -o-linear-gradient(top, #ffc63a 0%, #ffbf21 100%);
+  background-image: -webkit-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
+  background-image: -o-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
   background-image: -webkit-gradient(linear, left top, left bottom, from(#ffc63a), to(#ffbf21));
-  background-image: linear-gradient(to bottom, #ffc63a 0%, #ffbf21 100%);
+  background-image: linear-gradient(to bottom, #35dbf1 0%, #35dbf1 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffc63a', endColorstr='#ffffbf21', GradientType=0);
   background-repeat: repeat-x;
 }

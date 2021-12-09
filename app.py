@@ -109,7 +109,7 @@ def vendors():
   #       num_shows should be aggregated based on number of upcoming shows per venue.
 
   vendors = Vendor.query.order_by(db.desc(Vendor.id))
-
+  #recommend_vendors_from_favorites(1)
   dealInfo = []
   result = db.session.query(Vendor).join(Deals).filter(Vendor.id == Deals.vendor_id).all()
 
@@ -177,6 +177,7 @@ def show_vendor(vendor_id):
     }
     allDeals.append(deal_info)
 
+  similar_vendors = find_most_similar(vendor_id)
   data={
     "id": vendor.id,
     "name": vendor.name,
@@ -186,7 +187,8 @@ def show_vendor(vendor_id):
     "cost": vendor.cost*'$',
     "purchase_to_points": vendor.purchase_to_points,
     "fullMenu": fullMenu,
-    "allDeals" : allDeals
+    "allDeals" : allDeals,
+    "similar_vendors": similar_vendors[:3]
   }
   return render_template('pages/show_vendor.html', vendor=data)
 
@@ -210,13 +212,10 @@ def create_vendor_submission():
   try:
     db.session.add(new_vendor)
     db.session.commit()
-    # on successful db insert, flash success
     flash('Vendor ' + request.form['name'] + ' was successfully listed!')
   except:
     db.session.rollback()
-    # TODO: on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Vendor ' + request.form['name'] + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   finally:
     db.session.close()
   return redirect(url_for('index'))
@@ -261,6 +260,8 @@ def edit_vendor_submission(vendor_id):
 
   vendor.name = request.form['name']
   vendor.category = request.form['category']
+  vendor.cuisine = request.form['cuisine']
+  vendor.cost = request.form['cost']
   vendor.location = request.form['location']
 
   try:
@@ -281,6 +282,7 @@ def edit_vendor_submission(vendor_id):
 def users():
   # TODO: replace with real data returned from querying the database
   data= User.query.with_entities(User.id, User.username).all()
+  recommend_vendors_from_favorites(1)
   return render_template('pages/users.html', users=data)
 
 #Searches all the users
@@ -313,8 +315,10 @@ def show_user(user_id):
     "username" : user.username,
     "id" : user.id,
     "rewards" : user.vendors,
-    "favorites" : favorites
+    "favorites" : favorites,
+    "recs" :  recommend_vendors_from_favorites(user_id)
   }
+
   return render_template('pages/show_user.html', user=user)
   
 
@@ -338,6 +342,22 @@ def create_user_submission():
     db.session.rollback()
     # TODO: on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Artist ' + new_user.username + ' could not be added.')
+  finally:
+    db.session.close()
+  return redirect(url_for('index'))
+
+@app.route('/users/delete/<int:user_id>', methods=['GET', 'POST'])
+def delete_user(user_id):
+
+  deleted_user = User.query.get(user_id)
+  userName = deleted_user.username
+  try:
+    db.session.delete(deleted_user)
+    db.session.commit()
+    flash('User ' + userName + ' was successfully deleted!')
+  except:
+    db.session.rollback()
+    flash('Please try again. User ' + userName + ' could not be deleted.')
   finally:
     db.session.close()
   return redirect(url_for('index'))
@@ -561,6 +581,10 @@ def create_add_favorites_form(user_id):
 def create_add_favorites_submission(user_id):
   
   vendor_id = request.form['vendor']
+  print(vendor_id)
+  print("is vendor ID")
+  print(user_id)
+  print("is user id")
   statement = favorites.insert().values(user_id=user_id, vendor_id=vendor_id)
   try:
     db.session.execute(statement)
@@ -669,10 +693,106 @@ def create_delete_menu_item_submission(vendor_id):
     db.session.close()
   return redirect(url_for('vendors', vendor_id=vendor_id))
 
-def find_similar_vendor(vendor_id):
-  vendor = Vendor.query.get(vendor_id)
+#returns vendors with the same category
+def find_similar_vendor_category(vendor_id):
+  original_vendor = Vendor.query.get(vendor_id)
   
+  stmt = db.select(Vendor).where(
+    (Vendor.category == original_vendor.category) &
+    (Vendor.id != vendor_id )
+  )
 
+  result = db.session.execute(stmt)
+  vendors = [row[0] for row in result]
+  return vendors
+
+#returns vendors with the same cuisine type
+def find_similar_vendor_cuisine(vendor_id):
+  original_vendor = Vendor.query.get(vendor_id)
+  
+  stmt = db.select(Vendor).where(
+    (Vendor.cuisine == original_vendor.cuisine) &
+    (Vendor.id != vendor_id )
+  )
+
+  result = db.session.execute(stmt)
+  vendors = [row[0] for row in result]
+  return vendors
+
+#returns vendors with the same cost 
+def find_similar_vendor_cost(vendor_id):
+  original_vendor = Vendor.query.get(vendor_id)
+  
+  stmt = db.select(Vendor).where(
+    (Vendor.cost == original_vendor.cost) &
+    (Vendor.id != vendor_id )
+  )
+
+  result = db.session.execute(stmt)
+  vendors = [row[0] for row in result]
+  return vendors
+
+def find_most_similar(vendor_id):
+
+  same_category = find_similar_vendor_category(vendor_id)
+  same_cuisine = find_similar_vendor_cuisine(vendor_id)
+  same_cost = find_similar_vendor_cost(vendor_id)
+
+  vendors = Vendor.query.all()
+  vendor_info = []
+  
+  for vendor in vendors:
+    count = 0
+    if vendor in same_category:
+      count += 1
+    if vendor in same_cuisine:
+      count += 1
+    if vendor in same_cost:
+      count += 1
+    info = {
+      "vendor" : vendor,
+      "count" : count
+    }
+    if count >= 1:
+      vendor_info.append(info)
+  
+  def myFunc(e):
+    return e['count']
+
+  vendor_info.sort(reverse=True, key=myFunc)
+  print(vendor_info)
+  return vendor_info
+
+def recommend_vendors_from_favorites(user_id):
+  user = User.query.get(user_id)
+  favorite_vendors = user.favorites
+  similar_vendors = []
+
+  for vendor in favorite_vendors:
+    similar_favs = find_most_similar(vendor.id)
+
+    already_listed=False
+    for vendor_info in similar_favs:
+      for already_listed in similar_vendors:
+        if vendor_info['vendor'] == already_listed['vendor']:
+          already_listed['count'] += vendor_info['count']
+          already_listed=True
+        elif vendor_info['vendor'] in favorite_vendors:
+          already_listed = True
+        #print(vendor_info['vendor'])
+        #print(favorite_vendors)
+      if already_listed != True:
+        similar_vendors.append(vendor_info)
+      else:
+        already_listed = False
+
+  def myFunc(e):
+    return similar_vendors.count(e)
+
+  similar_vendors.sort(reverse=True, key=myFunc)
+  #print("here we go")
+  #print(similar_vendors)
+  return(similar_vendors)
 
 
 

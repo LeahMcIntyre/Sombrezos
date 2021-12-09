@@ -19,7 +19,7 @@ section > h2 {
 }
 a {
   cursor: pointer;
-  color: #ff8c3a;
+  color: #b7f6f8;
 }
 .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
   background: initial;
@@ -111,11 +111,11 @@ ul.items > li > a > i {
   padding: 7px 10px 0;
 }
 ul.items > li:hover {
-  color: orange;
+  color: blue;
   cursor: pointer;
 }
 ul.items > li:hover h5 {
-  color: orange;
+  color: blue;
 }
 .item {
   padding: 5px 5px 5px;

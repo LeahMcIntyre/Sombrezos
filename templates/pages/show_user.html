@@ -12,6 +12,22 @@
 			<p class="subtitle">
 				Favorite Vendors: {{ user.favorites }}
 			</p>
+			</div>
+</div>
+
+<section>
+	<h2 class="monospace">Recommended Vendors From Favorites</h2>
+	<div class="item">
+		{%for record in user.recs %}
+		<p class="item">
+			Name: {{ record.vendor.name}} <br>
+			Recommendation Score: {{record.count}} 
+		</p>
+		{% endfor %}
+	</div>
+</section>
+
+			
 
 
 			<h5><a href="/users/delete/{{ user.id }}"> Delete: {{ user.username }}</a></h5>
