@@ -39,7 +39,22 @@
 		
 		{% endfor %}
 	</div>
-	<a href="/vendors/{{ vendor.id }}/purchase"><button class="btn btn-default btn-lg">Make a purchase</button></a>
+	<a href="/vendors/{{ vendor.id }}/purchase"><button class="btn btn-default btn-lg">Log Purchase from Menu</button></a>
+</section>
+
+<section>
+	<h2 class="monospace">Deals</h2>
+	<div class="row">
+		
+		{%for deal in vendor.allDeals %}
+		<p class="item">
+			{{ deal.item}}: ${{ deal.price}} or {{deal.points_required}} rewards points 
+		</p> 
+		
+		
+		{% endfor %}
+	</div>
+	<a href="/vendors/{{ vendor.id }}/purchase_deal"><button class="btn btn-default btn-lg"> Log Purchase from Deal</button></a>
 </section>
 
 <a href="/vendors/{{ vendor.id }}/edit"><button class="btn btn-default btn-lg">Edit Vendor Info</button></a>

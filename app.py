@@ -96,8 +96,6 @@ class Menu(db.Model):
 @app.route('/')
 def index():
   recentVendors = Vendor.query.order_by(db.desc(Vendor.id)).limit(10).all()
-  #recentArtists = Artist.query.order_by(db.desc(Artist.id)).limit(10).all()
-  print("help")
   return render_template('pages/home.html',vendors = recentVendors)
 
 
@@ -109,9 +107,29 @@ def index():
 def vendors():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data = Vendor.query.order_by(db.desc(Vendor.id))
 
-  return render_template('pages/vendors.html', vendors=data);
+  vendors = Vendor.query.order_by(db.desc(Vendor.id))
+
+  dealInfo = []
+  result = db.session.query(Vendor).join(Deals).filter(Vendor.id == Deals.vendor_id).all()
+
+  for row in result:
+   for offer in row.offers:
+      info = {
+        "vendor_id" : row.id,
+        "vendor_name": row.name,
+        "deal_item" : offer.item,
+        "deal_price": offer.price,
+        "deal_points": offer.points_required
+      }
+      dealInfo.append(info)
+
+  data = {
+    "vendors" : vendors,
+    "deals" : dealInfo
+  }
+
+  return render_template('pages/vendors.html', data=data);
 
 #Search for vendors
 @app.route('/vendors/search', methods=['POST'])
@@ -138,7 +156,10 @@ def show_vendor(vendor_id):
   vendor = Vendor.query.get(vendor_id)
   
   menuItems = vendor.menuItems
+  deals = vendor.offers
   fullMenu = []
+  allDeals = []
+
 
   for menu in menuItems: 
     menu_info= {
@@ -148,6 +169,14 @@ def show_vendor(vendor_id):
     }
     fullMenu.append(menu_info)
 
+  for deal in deals:
+    deal_info={
+      "item": deal.item,
+      "price": deal.price,
+      "points_required" : deal.points_required
+    }
+    allDeals.append(deal_info)
+
   data={
     "id": vendor.id,
     "name": vendor.name,
@@ -156,7 +185,8 @@ def show_vendor(vendor_id):
     "cuisine": vendor.cuisine,
     "cost": vendor.cost*'$',
     "purchase_to_points": vendor.purchase_to_points,
-    "fullMenu": fullMenu
+    "fullMenu": fullMenu,
+    "allDeals" : allDeals
   }
   return render_template('pages/show_vendor.html', vendor=data)
 
@@ -366,6 +396,7 @@ def create_purchase_submission(vendor_id):
 
   new_points = price * conversion
   result = rewards.query.filter(rewards.vendor_id == vendor_id,  rewards.user_id == user_id).first()
+
   
   if result:
     result.points = result.points + new_points
@@ -396,6 +427,72 @@ def create_purchase_submission(vendor_id):
     finally:
       db.session.close()
   return redirect(url_for('show_rewards', user_id=user_id))
+
+
+
+#  Updating Rewards When Rewards Used To Purchase Deal
+#  ----------------------------------------------------------------
+@app.route('/vendors/<int:vendor_id>/purchase_deal', methods = ['GET', 'POST'])
+def create_purchase_deal_form(vendor_id):
+
+  vendor = Vendor.query.get(vendor_id)
+  users = User.query.with_entities(User.id, User.username).all()
+
+  deals = vendor.offers
+  allDeals = []
+
+  for deal in deals: 
+    deal_info= {
+      "id": deal.id,
+      "item": deal.item,
+      "price": deal.price
+    }
+    allDeals.append(deal_info)
+
+  user_info =[]
+  for user in users:
+    info = {
+      "id": user.id,
+      "username": user.username
+    }
+    user_info.append(info)
+  
+  data = {
+    "users": user_info,
+    "vendor_id": vendor.id,
+    "deals" : allDeals
+  }
+  return render_template('forms/purchase_deal.html', data=data)
+
+@app.route('/vendors/<int:vendor_id>/purchase_deal_info', methods=['POST'])
+def create_purchase_deal_submission(vendor_id):
+
+  user_id = request.form['user']
+  deal_id = request.form['item']
+
+  vendor = Vendor.query.get(vendor_id)
+  user = User.query.get(user_id)
+  deal = Deals.query.get(deal_id)
+
+  reward_points = rewards.query.filter(rewards.vendor_id == vendor_id,  rewards.user_id == user_id).first()
+
+  if request.form['purchase_type'] == 'points':
+    if reward_points.points >= deal.points_required:
+      reward_points.points = reward_points.points - deal.points_required
+      try:
+        db.session.commit()
+        flash('Purchase of Deal Logged')
+      except:
+        flash('Purchase could not be logged')
+      finally:
+        db.session.close()
+    else:
+      flash('Not enough points to purchase deal with points')
+  
+  
+  return redirect(url_for('show_rewards', user_id=user_id))
+
+
 
 #Display the rewards the user has with 
 @app.route('/users/<int:user_id>/rewards')
@@ -571,6 +668,11 @@ def create_delete_menu_item_submission(vendor_id):
   finally:
     db.session.close()
   return redirect(url_for('vendors', vendor_id=vendor_id))
+
+def find_similar_vendor(vendor_id):
+  vendor = Vendor.query.get(vendor_id)
+  
+
 
 
 

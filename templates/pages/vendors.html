@@ -1,8 +1,9 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Sombreza | Vendors{% endblock %}
 {% block content %}
+
 <ul class="items">
-	{% for vendor in vendors %}
+	{% for vendor in data.vendors %}
 	<li>
 		<a href="/vendors/{{ vendor.id }}">
 			<div class="item">
@@ -11,6 +12,19 @@
 		</a>
 	</li>
 	{% endfor %}
+</ul>
+
+
+<ul class="deals">
+	{% for deal in data.deals %}
+	<li>
+		
+		<h5>{{ deal.vendor_name }} : {{ deal.deal_item }} for {{ deal.deal_price }} dollars or {{ deal.deal_points }} points</h5>
+			
+	</li>
+	{% endfor %}
+
+	
 </ul>
 
 {% endblock %}
