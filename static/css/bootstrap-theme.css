@@ -539,7 +539,7 @@ fieldset[disabled] .btn-danger.active {
 .panel-primary > .panel-heading {
   background-image: -webkit-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
   background-image: -o-linear-gradient(top, #35dbf1 0%, #35dbf1 100%);
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#ffc63a), to(#ffbf21));
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#35dbf1), to(#35dbf1));
   background-image: linear-gradient(to bottom, #35dbf1 0%, #35dbf1 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffc63a', endColorstr='#ffffbf21', GradientType=0);
   background-repeat: repeat-x;

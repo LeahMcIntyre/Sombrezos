@@ -1,19 +1,15 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Sombreza | Users{% endblock %}
 {% block content %}
-<ul class="items">
+<h4>Users</h4>
+
+<ul class="list-group">
 	{% for user in users %}
-	<li>
-		<a href="/users/{{ user.id }}">
-			<i class="fas fa-users"></i>
-			<div class="item">
-				<h5>{{ user.username }}</h5>
-			</div>
-		</a>
-	</li>
+		<a href="/users/{{ user.id }}" class="list-group-item"> {{ user.username }} </a>
 	{% endfor %}
-
-	<a href="/users/create"><button class="btn btn-default btn-lg">Add a user</button></a>
-
 </ul>
+<br>
+	
+	<a href="/users/create" class="btn btn-primary">Add a user</button></a>
+
 {% endblock %}

@@ -1,19 +1,26 @@
 {% extends 'layouts/main.html' %}
-{% block title %}Sombrezos{% endblock %}
+{% block title %} Sombrezos{% endblock %}
 {% block content %}
 <div class="row">
 	<div class="col-sm-6">
-		<h1>Sombrezos 🍲 </h1>
-		<p class="lead">A virtual food</p>
-		<h3>
-			<a href="/vendors"><button class="btn btn-primary btn-lg">Find a vendor</button></a>
-			<a href="/vendors/create"><button class="btn btn-primary btn-lg">Create a vendor</button><br></a>
-			<a href="/users"><button class="btn btn-primary btn-lg">Find a user</button></a>
-			<a href="/users/create"><button class="btn btn-primary btn-lg">Create a user</button></a>
-
-
-		</h3>
+		<h1>Sombrezos  </h1>
+		<p class="lead">A Virtual Food Court</p>
+		<div class="btn-group">
+			<a href="/users"class="btn btn-primary">Find a user</a>
+			<a href="/users/create" class="btn btn-primary">Create a user</a>
+		</div>
+		<br>
+		<br>
+		<div class="btn-group">
+			<a href="/vendors" class="btn btn-primary">Find a vendor</a>
+			<a href="/vendors/create" class="btn btn-primary">Create a vendor</a>
+		</div>
+		<br>
+		<br>
+		<a href="/quiz" class="btn btn-secondary">Take our quiz!</a>
 	</div>
+	
+
 	<div class="col-sm-6 hidden-sm hidden-xs">
 		<img id="front-splash" src="{{ url_for('static',filename='img/front-splash.jpg') }}" alt="Front Photo of Food Court" />
 	</div>

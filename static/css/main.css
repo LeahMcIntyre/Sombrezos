@@ -19,7 +19,7 @@ section > h2 {
 }
 a {
   cursor: pointer;
-  color: #b7f6f8;
+  color: #000000;
 }
 .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
   background: initial;
@@ -29,15 +29,15 @@ p.lead {
   margin-top: 30px;
 }
 ::selection {
-  background: #555;
-  color: #FFF;
+  background: #000000;
+  color: #b8eafd;
 }
 ::-moz-selection {
-  background: #555;
+  background: #a4e5e7;;
   color: #FFF;
 }
 ::-webkit-selection {
-  background: #555;
+  background: #a4e5e7;;
   color: #FFF;
 }
 /* Main elements end */
@@ -82,9 +82,9 @@ p.lead {
 
 .btn-default {
     border: none;
-    background-color: #dde2e7;
+    background-color: #6eb1d8;
     background-image: linear-gradient(#dde2e7,#dde2e7);
-    color: #444;
+    color: #080808;;
 }
 
 #content h3 {
@@ -111,11 +111,11 @@ ul.items > li > a > i {
   padding: 7px 10px 0;
 }
 ul.items > li:hover {
-  color: blue;
+  color: #2020f5;
   cursor: pointer;
 }
 ul.items > li:hover h5 {
-  color: blue;
+  color: #2020f5;
 }
 .item {
   padding: 5px 5px 5px;

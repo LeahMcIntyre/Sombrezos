@@ -1,3 +1,7 @@
+{% extends 'layouts/main.html' %}
+{% block title %}New Purchase{% endblock %}
+{% block content %}
+
 <form action = "/users/{{data.user_id}}/add_favorites_info" method = "post" >
     <div>
         <label for="favorite">Choose a vendor to add to your favorites:</label>
@@ -11,3 +15,5 @@
     <input type="submit">
 
 </form>
+
+{% endblock %}

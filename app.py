@@ -8,13 +8,15 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from collections import Counter
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from sqlalchemy.orm import backref
+from sqlalchemy import or_
 from forms import *
 from flask_migrate import Migrate
-from datetime import datetime
+from statistics import mode
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -310,13 +312,15 @@ def show_user(user_id):
   for vendor in user.favorites:
     favorites.append(vendor.name)
   
+  rewards_info = show_rewards(user_id)
 
   user={
     "username" : user.username,
     "id" : user.id,
     "rewards" : user.vendors,
     "favorites" : favorites,
-    "recs" :  recommend_vendors_from_favorites(user_id)
+    "recs" :  recommend_vendors_from_favorites(user_id),
+    "rewards" : rewards_info
   }
 
   return render_template('pages/show_user.html', user=user)
@@ -368,6 +372,7 @@ def delete_user(user_id):
 @app.route('/vendors/<int:vendor_id>/purchase', methods = ['GET', 'POST'])
 def create_purchase_form(vendor_id):
 
+
   vendor = Vendor.query.get(vendor_id)
   users = User.query.with_entities(User.id, User.username).all()
 
@@ -405,19 +410,26 @@ def create_purchase_submission(vendor_id):
   conversion = vendor.purchase_to_points
   user = User.query.get(user_id)
 
-  print("help+me")
-  print(user_id)
-  purchase_items = request.form['items']
+  
+  purchase_item = request.form['items']
+  print("purchase_items:", purchase_item)
   price = 0
+  print("price before set:", price)
 
-  for purchase_id in purchase_items:
-    item = Menu.query.get(purchase_id)
-    price = price + item.price
+
+  #for purchase_id in purchase_items:
+  print("purchase_id:", purchase_item)
+  item = Menu.query.get(purchase_item)
+  print("item", item)
+  price = price + item.price
+
+  print("price after set:", price)
 
   new_points = price * conversion
   result = rewards.query.filter(rewards.vendor_id == vendor_id,  rewards.user_id == user_id).first()
 
-  
+  print(result)
+
   if result:
     result.points = result.points + new_points
     try:
@@ -446,7 +458,7 @@ def create_purchase_submission(vendor_id):
       flash('Purchase could not be made!')
     finally:
       db.session.close()
-  return redirect(url_for('show_rewards', user_id=user_id))
+  return redirect(url_for('show_user', user_id=user_id))
 
 
 
@@ -515,7 +527,6 @@ def create_purchase_deal_submission(vendor_id):
 
 
 #Display the rewards the user has with 
-@app.route('/users/<int:user_id>/rewards')
 def show_rewards(user_id):
   user = User.query.get(user_id)
   
@@ -528,11 +539,8 @@ def show_rewards(user_id):
     }
     reward_info.append(info)
     
-  data = {
-    "user": user_id,
-    "reward_info" : reward_info
-  }
-  return render_template('pages/show_rewards.html',data = data)
+  
+  return reward_info
 
 #  Create Deals
  #  ----------------------------------------------------------------
@@ -633,19 +641,24 @@ def create_delete_favorites_submission(user_id):
 
 @app.route('/vendors/<int:vendor_id>/add_menu_item', methods=['GET'])
 def create_add_menu_form(vendor_id):
-  form = DealForm()
+  form = MenuForm()
   return render_template('forms/new_menu.html', form=form, vendor_id=vendor_id)
 
 @app.route('/vendors/<int:vendor_id>/add_menu_item', methods=['POST'])
 def create_add_menu_submission(vendor_id):
   new_menu = Menu()
   new_menu.item = (request.form['item'])
-  new_menu.price = request.form['price']
+  new_menu.price = int (request.form['price'])
   
   new_menu.vendor_id = vendor_id
+
   try:
     db.session.add(new_menu)
     db.session.commit()
+    print("New menu item", new_menu.item)
+    print("New menu vendor_id:", new_menu.vendor_id)
+    print("New menu price:", new_menu.price)
+    print("New menu id:", new_menu.id)
      # on successful db insert, flash success
     flash('Item ' + request.form['item'] + ' were successfully added to the menu')
   except:
@@ -692,6 +705,91 @@ def create_delete_menu_item_submission(vendor_id):
   finally:
     db.session.close()
   return redirect(url_for('vendors', vendor_id=vendor_id))
+
+
+#Quiz
+@app.route('/quiz', methods=['GET'])
+def create_quiz():
+  return render_template('forms/quiz.html')
+
+@app.route('/quiz/results', methods=['POST'])
+def get_results():
+  hunger = int(request.form['hungry'])
+  time = int(request.form['time'])
+  hour = int(request.form['hour'])
+  company = int(request.form['company'])
+  budget = int(request.form['budget'])
+
+  matches = get_hunger_matches(hunger)
+
+ # matches.append(get_hunger_matches(hunger))
+  for vendor in (get_time_matches(time)):
+    matches.append(vendor)
+
+  for vendor in (get_hour_matches(hour)):
+    matches.append(vendor)
+
+  for vendor in (company_matches(company)):
+    matches.append(vendor)
+
+  for vendor in (get_budget_matches(budget)):
+    matches.append(vendor)
+
+  print("matches", matches)
+
+  
+  vendor_id = max(matches, key = matches.count)[:1]
+  vendor = Vendor.query.get(vendor_id)
+  data = vendor
+
+  
+  return render_template('pages/results.html', data=data)
+
+
+def get_hunger_matches(hunger_level): 
+  if hunger_level <= 2:
+    results = db.session.query(Vendor.id).filter(or_(Vendor.cuisine== "Thai", Vendor.cuisine== "Vegetarian", Vendor.cuisine == "Chinese", Vendor.cuisine == "Greek")).all()
+    #results = db.session.query(Vendor).filter(Vendor.cuisine== "Thai").all()
+    #print(results)
+  else:
+    results = db.session.query(Vendor.id).filter(or_(Vendor.cuisine == "Italian", Vendor.cuisine == "American", Vendor.cuisine == "Indian", Vendor.cuisine == "American")).all()
+  return results
+
+def get_time_matches(time):
+  if time == 1:
+    results = db.session.query(Vendor.id).filter(Vendor.category == 'Sit-down').all()
+  elif time == 2:
+    results = db.session.query(Vendor.id).filter(Vendor.category == 'Counter').all()
+  else:
+    results= db.session.query(Vendor.id).filter(Vendor.category == 'Drive-thru').all()
+  return results
+
+def get_hour_matches(hour):
+  if hour == 2:
+    results = db.session.query(Vendor.id).filter(or_(Vendor.category == 'Counter', Vendor.cost == 1)).all()
+  elif hour == 3:
+    results= db.session.query(Vendor.id).filter(Vendor.category == 'Drive-thru').all()
+  else:
+    results = []
+  return results
+
+def company_matches(company):
+  if company == 1:
+    results = db.session.query(Vendor.id).filter(or_(Vendor.category == 'Counter', Vendor.category == 'Drive-thru')).all()
+  if company == 2:
+    results = db.session.query(Vendor.id).filter(Vendor.category == 'Sit-down', or_(Vendor.cost == 1, Vendor.cost == 2)).all()
+  if company == 3:
+    results = db.session.query(Vendor.id).filter(Vendor.category == 'Counter').all()
+  return results
+
+def get_budget_matches(budget):
+  if budget == 1:
+    results = db.session.query(Vendor.id).filter(Vendor.cost == 1).all()
+  elif budget == 2:
+    results = db.session.query(Vendor.id).filter(or_(Vendor.cost == 1, Vendor.cost==2)).all()
+  else:
+    results = db.session.query(Vendor.id).filter(or_(Vendor.cost == 3, Vendor.cost == 4)).all()
+  return results 
 
 #returns vendors with the same category
 def find_similar_vendor_category(vendor_id):

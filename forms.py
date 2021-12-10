@@ -36,7 +36,8 @@ class VendorForm(Form):
             ('Thai', 'Thai'),
             ('Indian', 'Indian'),
             ('Chinese', 'Chinese'),
-            ('Greek', 'Greek')
+            ('Greek', 'Greek'),
+            ('Vegetarian', 'Vegetarian')
         ]
     )
     location = StringField('location')
