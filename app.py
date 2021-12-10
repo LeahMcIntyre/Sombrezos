@@ -136,10 +136,10 @@ def vendors():
 #Search for vendors
 @app.route('/vendors/search', methods=['POST'])
 def search_vendors():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
-  # seach for Hop should return "The Musical Hop".
-  # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  results = Vendor.query.filter(Vendor.name.ilike('%{}%'.format(request.form['search_term']))).all()
+ 
+  search_term = request.form['search_term']
+  search = '%{}%'.format(search_term)
+  results = Vendor.query.filter(Vendor.name.ilike(search)).all()
   response={
     "count": len(results),
     "data": []
@@ -290,7 +290,9 @@ def users():
 #Searches all the users
 @app.route('/users/search', methods=['POST'])
 def search_users():
-  results = User.query.filter(User.username.ilike('%{}%'.format(request.form['search_term']))).all()
+  search_term = request.form['search_term']
+  search = '%{}%'.format(search_term)
+  results = User.query.filter(User.username.ilike(search)).all()
 
   response={
     "count": len(results),
@@ -545,7 +547,7 @@ def show_rewards(user_id):
 #  Create Deals
  #  ----------------------------------------------------------------
 
-@app.route('/deals/create', methods=['GET'])
+@app.route('/deals/create/<int:vendor_id>', methods=['GET'])
 def create_deal_form():
   form = DealForm()
   return render_template('forms/new_deal.html', form=form)

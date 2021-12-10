@@ -18,8 +18,8 @@ rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCE
   <div id="wrap">
 
     <!-- Fixed navbar -->
-    <div class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
+    <div class="navbar navbar-expand-sm navbar-secondary bg-light">
+      <div class="container-fluid">
         <div class="navbar-header">
           
           <a class="navbar-brand" href="/">Sombrezos ⌂</a>
@@ -41,7 +41,7 @@ rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCE
               {% if (request.endpoint == 'users') or
                 (request.endpoint == 'search_users') or
                 (request.endpoint == 'show_user') %}
-              <form class="search" method="post" action="/user/search">
+              <form class="search" method="post" action="/users/search">
                 <input class="form-control"
                   type="search"
                   name="search_term"
@@ -51,8 +51,8 @@ rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCE
               {% endif %}
             </li>
           </ul>
-          <ul class="nav navbar-nav">
-            <li {% if request.endpoint == 'vendors' %} class="active" {% endif %}><a href="{{ url_for('vendors') }}">Vendors</a></li>
+          <ul class="navbar-nav">
+            <li {% if request.endpoint == 'vendors' %} class="active" {% endif %}><a href="{{ url_for('vendors') }}">Vendors</a></li> <br>
             <li {% if request.endpoint == 'users' %} class="active" {% endif %}><a href="{{ url_for('users') }}">Users</a></li>
           </ul>
         </div><!--/.nav-collapse -->
