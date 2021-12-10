@@ -15,28 +15,33 @@
         {{ form.category(class_ = 'form-control', autofocus = true) }}
       </div>
 
+      <br>
       <div class="form-group">
         <label for="cost">Cost</label>
         <h6 class="form-group">{{ vendor.cost }}</h6>
         {{ form.cost(class_ = 'form-control', autofocus = true) }}
       </div>
+      <br>
 
       <div class="form-group">
         <label for="cuisine">Cuisine</label>
         <h6 class="form-group">{{ vendor.cuisine }} </h6>
         {{ form.cuisine(class_ = 'form-control', autofocus = true) }}
       </div>
-      
+      <br>
+
       <div class="form-group">
         <label for="location">Location</label>
         {{ form.location(class_ = 'form-control', autofocus = true) }}
       </div>
+      <br>
 
       <div class="form-group">
         <label for="purchase_to_points">Points Per Dollar Spent</label>
         <h6 class="form-group">{{ vendor.purchase_to_points }}</h6>
         {{ form.purchase_to_points(class_ = 'form-control', autofocus = true) }}
       </div>
+      <br>
 
       
       <input type="submit" value="Edit vendor" class="btn btn-primary btn-lg btn-block">

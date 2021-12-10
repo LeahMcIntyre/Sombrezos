@@ -26,7 +26,7 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-# TODO: connect to a local postgresql database
+#  connect to a local postgresql database
 migration = Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
@@ -107,11 +107,8 @@ def index():
 #Show all the vendors
 @app.route('/vendors')
 def vendors():
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
 
   vendors = Vendor.query.order_by(db.desc(Vendor.id))
-  #recommend_vendors_from_favorites(1)
   dealInfo = []
   result = db.session.query(Vendor).join(Deals).filter(Vendor.id == Deals.vendor_id).all()
 
@@ -282,9 +279,7 @@ def edit_vendor_submission(vendor_id):
 #Lists all the users
 @app.route('/users')
 def users():
-  # TODO: replace with real data returned from querying the database
   data= User.query.with_entities(User.id, User.username).all()
-  recommend_vendors_from_favorites(1)
   return render_template('pages/users.html', users=data)
 
 #Searches all the users
@@ -321,7 +316,7 @@ def show_user(user_id):
     "id" : user.id,
     "rewards" : user.vendors,
     "favorites" : favorites,
-    "recs" :  recommend_vendors_from_favorites(user_id),
+    "recs" :  recommend_vendors_from_favorites(user_id)[:3],
     "rewards" : rewards_info
   }
 
@@ -338,7 +333,6 @@ def create_user_form():
 def create_user_submission():
   new_user = User()
   new_user.username = request.form['username']
-  #new_user.favorites = request.form['favorites']
   try:
     db.session.add(new_user)
     db.session.commit()
@@ -346,7 +340,7 @@ def create_user_submission():
     flash('User ' + request.form['username'] + ' was successfully added!')
   except:
     db.session.rollback()
-    # TODO: on unsuccessful db insert, flash an error instead.
+    #  on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Artist ' + new_user.username + ' could not be added.')
   finally:
     db.session.close()
@@ -440,7 +434,7 @@ def create_purchase_submission(vendor_id):
       flash('Purchase Made')
     except:
       db.session.rollback()
-      # TODO: on unsuccessful db insert, flash an error instead.
+      # on unsuccessful db insert, flash an error instead.
       flash('Purchase could not be made!')
     finally:
       db.session.close()
@@ -456,7 +450,7 @@ def create_purchase_submission(vendor_id):
       flash('Purchase Made')
     except:
       db.session.rollback()
-      # TODO: on unsuccessful db insert, flash an error instead.
+      #  on unsuccessful db insert, flash an error instead.
       flash('Purchase could not be made!')
     finally:
       db.session.close()
@@ -547,7 +541,7 @@ def show_rewards(user_id):
 #  Create Deals
  #  ----------------------------------------------------------------
 
-@app.route('/deals/create/<int:vendor_id>', methods=['GET'])
+@app.route('/deals/create', methods=['GET',])
 def create_deal_form():
   form = DealForm()
   return render_template('forms/new_deal.html', form=form)
@@ -566,7 +560,7 @@ def create_deals_submission():
     flash('Deal ' + request.form['item'] + ' were successfully added!')
   except:
     db.session.rollback()
-     # TODO: on unsuccessful db insert, flash an error instead.
+     #on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Deal ' + new_deal.item + ' could not be added.')
   finally:
     db.session.close()
@@ -665,7 +659,7 @@ def create_add_menu_submission(vendor_id):
     flash('Item ' + request.form['item'] + ' were successfully added to the menu')
   except:
     db.session.rollback()
-     # TODO: on unsuccessful db insert, flash an error instead.
+     #on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Item ' + new_menu.item + ' could not be added to the menu')
   finally:
     db.session.close()
@@ -724,7 +718,6 @@ def get_results():
 
   matches = get_hunger_matches(hunger)
 
- # matches.append(get_hunger_matches(hunger))
   for vendor in (get_time_matches(time)):
     matches.append(vendor)
 
@@ -751,8 +744,7 @@ def get_results():
 def get_hunger_matches(hunger_level): 
   if hunger_level <= 2:
     results = db.session.query(Vendor.id).filter(or_(Vendor.cuisine== "Thai", Vendor.cuisine== "Vegetarian", Vendor.cuisine == "Chinese", Vendor.cuisine == "Greek")).all()
-    #results = db.session.query(Vendor).filter(Vendor.cuisine== "Thai").all()
-    #print(results)
+  
   else:
     results = db.session.query(Vendor.id).filter(or_(Vendor.cuisine == "Italian", Vendor.cuisine == "American", Vendor.cuisine == "Indian", Vendor.cuisine == "American")).all()
   return results
@@ -870,28 +862,28 @@ def recommend_vendors_from_favorites(user_id):
 
   for vendor in favorite_vendors:
     similar_favs = find_most_similar(vendor.id)
-
-    already_listed=False
+    print("vendor:", vendor)
+    already_listed_value=False
     for vendor_info in similar_favs:
+      print("vendor_info", vendor_info)
       for already_listed in similar_vendors:
+        print("already_listed", already_listed)
         if vendor_info['vendor'] == already_listed['vendor']:
           already_listed['count'] += vendor_info['count']
-          already_listed=True
+          already_listed_value=True
         elif vendor_info['vendor'] in favorite_vendors:
-          already_listed = True
-        #print(vendor_info['vendor'])
-        #print(favorite_vendors)
-      if already_listed != True:
+          already_listed_value = True
+          print
+      if already_listed_value != True:
         similar_vendors.append(vendor_info)
       else:
-        already_listed = False
+        already_listed_value = False
 
   def myFunc(e):
     return similar_vendors.count(e)
 
   similar_vendors.sort(reverse=True, key=myFunc)
-  #print("here we go")
-  #print(similar_vendors)
+
   return(similar_vendors)
 
 
@@ -922,10 +914,3 @@ if not app.debug:
 # Default port:
 if __name__ == '__main__':
     app.run()
-
-# Or specify port manually:
-'''
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''
