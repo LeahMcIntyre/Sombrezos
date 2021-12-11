@@ -518,7 +518,7 @@ def create_purchase_deal_submission(vendor_id):
       flash('Not enough points to purchase deal with points')
   
   
-  return redirect(url_for('show_rewards', user_id=user_id))
+  return redirect(url_for('show_user', user_id=user_id))
 
 
 
